@@ -12,3 +12,18 @@ def test_context_includes_source():
 
 def test_empty_corpus():
     assert retrieve("question", documents=[]) == []
+
+def test_lab_results_retrieved():
+    hits = retrieve("How are laboratory results communicated?", k=2)
+    assert "lab_results.txt" in [name for name, _, _ in hits]
+
+def test_excludes_zero_scores_and_tiebreaks_by_filename():
+    docs = [
+        ("b.txt", "alpha beta"),
+        ("a.txt", "alpha beta"),
+        ("c.txt", "unrelated jargon"),
+    ]
+    hits = retrieve("alpha beta", k=5, documents=docs)
+    names = [name for name, _, _ in hits]
+    assert "c.txt" not in names
+    assert names == ["a.txt", "b.txt"]
